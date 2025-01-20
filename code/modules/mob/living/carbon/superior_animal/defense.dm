@@ -165,6 +165,7 @@
 
 /mob/living/carbon/superior_animal/adjustFireLoss(var/amount)
 	. = ..()
+	reagr_new_targets()
 	if (overkill_dust && (amount >= overkill_dust) && (getFireLoss() >= maxHealth*2))
 		dust()
 
