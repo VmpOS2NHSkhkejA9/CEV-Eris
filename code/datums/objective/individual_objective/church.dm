@@ -120,3 +120,26 @@
 	if(completed) return
 	UnregisterSignal(target_area, COMSIG_AREA_SANCTIFY)
 	..()
+
+/datum/individual_objective/kitty
+	name = "Purge"
+	req_department = list(DEPARTMENT_CHURCH)
+	req_cruciform = TRUE
+	limited_antag = TRUE
+	var/mob/living/carbon/human/target_heretic
+
+/datum/individual_objective/kitty/proc/set_target(mob/living/carbon/human/kitty_ear_wearer)
+	target_heretic = kitty_ear_wearer
+	desc = "[kitty_ear_wearer] has angered the angels. Witness their death."
+	RegisterSignal(mind_holder, COMSIG_MOB_DEATH, PROC_REF(task_completed))
+
+/datum/individual_objective/kitty/task_completed(dead_mob)
+	if(dead_mob == target_heretic)
+		completed()
+
+/datum/individual_objective/kitty/completed()
+	if(completed)
+		return
+	UnregisterSignal(mind_holder, COMSIG_MOB_DEATH)
+	..()
+

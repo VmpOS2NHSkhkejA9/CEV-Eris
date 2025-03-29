@@ -105,6 +105,46 @@
 	icon_state = "kitty"
 	body_parts_covered = 0
 
+/obj/item/clothing/head/collectable/kitty/equipped(mob/user, slot)
+	. = ..()
+
+	if(slot != slot_head)
+		return
+
+	var/mob/living/carbon/human/user_human = user
+	if(!user && !user.mind) //let's not send nt on a crusade against mindless bodies
+		. = ..()
+
+	//a foul heretic! gib them if they're cruciformed, otherwise announce them for all to hunt
+	if(user_human in disciples)
+		user_human.SetStunned(100)
+		user_human.shake_animation(20)
+		user_human.emote("scream")
+		user_human.take_overall_damage(75)
+		to_chat(user_human, SPAN_DANGER("You feel your body falter, your mind begin to tear. You have made a terrible mistake."))
+		spawn(5 SECONDS)
+			user_human.gib()
+
+	else
+		for(var/mob/living/carbon/human/H in disciples)
+			to_chat(H, SPAN_DANGER("You feel a flood of rage course through your cruciform... [user_human] has embraced heresy at [get_area(user_human)], the angels call for their death!"))
+			to_chat(H, SPAN_NOTICE("The eye of the protector has blessed you with strength, tenacity and dexterity to aid you in your crusade... but you can feel these blessings already begin to fade away..."))
+
+			var/datum/individual_objective/kitty/kittyobjective = new /datum/individual_objective/kitty
+			kittyobjective.assign(H.mind)
+			kittyobjective.set_target(user_human)
+
+			H.stats.addTempStat(STAT_ROB, STAT_LEVEL_PROF, 10 MINUTES)
+			H.stats.addTempStat(STAT_VIG, STAT_LEVEL_PROF, 10 MINUTES)
+			H.stats.addTempStat(STAT_TGH, STAT_LEVEL_PROF, 10 MINUTES)
+
+
+/obj/item/clothing/head/collectable/kitty/mob_can_unequip(mob/M, slot, disable_warning)
+	if(slot == slot_head)
+		return FALSE
+	else
+		. = ..()
+
 /obj/item/clothing/head/collectable/rabbitears
 	name = "collectable rabbit ears"
 	desc = "Not as lucky as the feet!"
